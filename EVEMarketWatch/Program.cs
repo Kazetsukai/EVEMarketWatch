@@ -1,5 +1,4 @@
 ﻿using Microsoft.Owin.Hosting;
-using NDatabase;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -15,6 +14,7 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using ZeroMQ;
 using EVEMarketWatch.Utils;
+using EVEMarketWatch.Domain;
 
 namespace EVEMarketWatch
 {
@@ -22,7 +22,7 @@ namespace EVEMarketWatch
     {
         static void Main(string[] args)
         {
-            ConcurrentQueue<string> messages = new ConcurrentQueue<string>();
+            ConcurrentQueue<Order> incomingOrders = new ConcurrentQueue<Order>();
 
             Thread thread = new Thread(() =>
             {
@@ -73,7 +73,7 @@ namespace EVEMarketWatch
 
                                 foreach (var order in orders)
                                 {
-                                    Console.WriteLine(order.price);
+                                    incomingOrders.Enqueue(order);
                                 }
                             }
                             catch (ZmqException ex)
@@ -85,20 +85,25 @@ namespace EVEMarketWatch
                 }
             });
 
+            var db = new OrderStorage();
+
             thread.Start();
 
-            using (var odb = OdbFactory.Open("test.db"))
-            {
-
-            }
-
+            List<Order> orderList = new List<Order>();
             while (true)
             {
-                string value;
-                if (messages.TryDequeue(out value))
+                orderList.Clear();
+                Order order;
+                while (incomingOrders.TryDequeue(out order))
                 {
-                    Console.WriteLine(value);
+                    orderList.Add(order);
                 }
+
+                db.AddOrders(orderList);
+                //var orders = db.Orders;
+
+                //Console.WriteLine(orders.Average(o => o.price) + "  - " + orders.Count());
+                if (orderList.Count > 0) Console.WriteLine(orderList.Count + " processed...");
             }
         }
     }

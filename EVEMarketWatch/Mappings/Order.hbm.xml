@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="EVEMarketWatch"
+                   namespace="EVEMarketWatch.Domain">
+
+  <class name="Order" table="Orders">
+    <id name="Id">
+      <generator class="guid" />
+    </id>
+    <property name="typeID" />
+    <property name="regionID" />
+    <property name="generatedAt" />
+    <property name="price" />
+    <property name="volRemaining" />
+    <property name="range" />
+    <property name="orderID" />
+    <property name="volEntered" />
+    <property name="minVolume" />
+    <property name="bid" />
+    <property name="issueDate" />
+    <property name="duration" />
+    <property name="stationID" />
+    <property name="solarSystemID" />
+  </class>
+
+</hibernate-mapping>
