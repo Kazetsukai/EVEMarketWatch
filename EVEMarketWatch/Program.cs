@@ -1,5 +1,6 @@
 ﻿using Microsoft.Owin.Hosting;
 using NDatabase;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using ZeroMQ;
+using EVEMarketWatch.Utils;
 
 namespace EVEMarketWatch
 {
@@ -65,16 +67,14 @@ namespace EVEMarketWatch
                                 // Transform data into JSON strings.
                                 string marketJson = Encoding.UTF8.GetString(decompressed);
 
-                                // Un-serialize the JSON data to a dictionary.
-                                var serializer = new JavaScriptSerializer();
-                                var dictionary = serializer.Deserialize<Dictionary<string, object>>(marketJson);
+                                var obj = JsonConvert.DeserializeObject<DataInterchange>(marketJson);
 
-                                // Dump the market data to console or, you know, do more fun things here.
-                                foreach (KeyValuePair<string, object> pair in dictionary)
+                                var orders = obj.ConvertToOrders();
+
+                                foreach (var order in orders)
                                 {
-                                    messages.Enqueue(String.Format("{0}: {1}", pair.Key, pair.Value));
+                                    Console.WriteLine(order.price);
                                 }
-                                Console.WriteLine();
                             }
                             catch (ZmqException ex)
                             {
