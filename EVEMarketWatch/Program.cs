@@ -1,11 +1,14 @@
 ﻿using Microsoft.Owin.Hosting;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using ZeroMQ;
@@ -18,6 +21,9 @@ namespace EVEMarketWatch
         {
             using (var context = ZmqContext.Create())
             {
+                ConcurrentQueue<string> messages = new ConcurrentQueue<string>();
+
+                
                 using (var subscriber = context.CreateSocket(SocketType.SUB))
                 {
                     //Connect to the first publicly available relay.
