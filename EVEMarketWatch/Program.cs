@@ -1,4 +1,5 @@
 ﻿using Microsoft.Owin.Hosting;
+using NDatabase;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,11 +20,11 @@ namespace EVEMarketWatch
     {
         static void Main(string[] args)
         {
-            using (var context = ZmqContext.Create())
-            {
-                ConcurrentQueue<string> messages = new ConcurrentQueue<string>();
+            ConcurrentQueue<string> messages = new ConcurrentQueue<string>();
 
-                Thread thread = new Thread(() =>
+            Thread thread = new Thread(() =>
+            {
+                using (var context = ZmqContext.Create())
                 {
                     using (var subscriber = context.CreateSocket(SocketType.SUB))
                     {
@@ -81,20 +82,24 @@ namespace EVEMarketWatch
                             }
                         }
                     }
-                });
-
-                thread.Start();
-
-                while (true)
-                {
-                    string value;
-                    if (messages.TryDequeue(out value))
-                    {
-                        Console.WriteLine(value);
-                    }
                 }
+            });
+
+            thread.Start();
+
+            using (var odb = OdbFactory.Open("test.db"))
+            {
+
             }
 
+            while (true)
+            {
+                string value;
+                if (messages.TryDequeue(out value))
+                {
+                    Console.WriteLine(value);
+                }
+            }
         }
     }
 }
