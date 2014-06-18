@@ -1,6 +1,7 @@
-﻿using EVEMarketWatch.Domain;
+﻿using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
+using NHibernate.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -8,8 +9,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EVEMarketWatch.Core.Domain;
 
-namespace EVEMarketWatch
+namespace EVEMarketWatch.Core
 {
     public class OrderStorage
     {
@@ -36,14 +38,22 @@ namespace EVEMarketWatch
             _sessionFactory = cfg.BuildSessionFactory();
         }
 
-        public IEnumerable<Order> Orders
+        public IEnumerable<T> GetOrders<T>(Func<IQueryable<Order>, IQueryable<T>> doQuery)
+        {
+            using (var session = _sessionFactory.OpenSession())
+            using (var tx = session.BeginTransaction())
+            {
+                return doQuery(session.Query<Order>()).ToList();
+            }
+        }
+
+        public IEnumerable<Order> RecentOrders
         {
             get 
             {
-                using (var session = _sessionFactory.OpenSession())
-                {
-                    return session.QueryOver<Order>().List();
-                }
+                return GetOrders(i => i
+                    .OrderByDescending(o => o.generatedAt)
+                    .Take(100000));
             }
         }
 

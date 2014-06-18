@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EVEMarketWatch.Domain
+namespace EVEMarketWatch.Core.Domain
 {
     public class History
     {
