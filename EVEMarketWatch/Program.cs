@@ -32,54 +32,8 @@ namespace EVEMarketWatch
             while (true)
             {
                 SaveToDatabase(incomingOrders, db);
-
-                SpotSweetDeals(db);
             }
         }
-
-        private static void SpotSweetDeals(OrderStorage db)
-        {
-            Console.WriteLine("Checking for sweet deals...");
-
-            var orders = db.RecentOrders.GroupBy(o => o.typeID);
-
-            var idealRatio = 1.1;
-
-            var deals = from g in orders
-                           let maxBuy = g.Any(o => o.bid) ? g.Where(o => o.bid).Max(o => o.price) : double.NegativeInfinity
-                           let minSell = g.Any(o => !o.bid) ? g.Where(o => !o.bid).Min(o => o.price) : double.PositiveInfinity
-                           where maxBuy / minSell > idealRatio
-                           select new
-                           {
-                               TypeId = g.Key,
-                               MaxBuy = maxBuy,
-                               MinSell = minSell,
-                               Buys = from o in g where o.bid && o.price / minSell > idealRatio select o,
-                               Sells = from o in g where !o.bid && maxBuy / o.price > idealRatio select o
-                           };
-
-            Console.WriteLine();
-            foreach (var deal in deals)
-            {
-                Console.WriteLine("--Potential deal found--");
-                Console.WriteLine("TypeID: {0}", deal.TypeId);
-                
-                Console.WriteLine();
-                Console.WriteLine("Buyers:");
-                foreach (var buy in deal.Buys)
-                {
-                    Console.WriteLine("{0} at {1} (StationID: {2})", buy.volRemaining, buy.price, buy.stationID);
-                } 
-                
-                Console.WriteLine();
-                Console.WriteLine("Sellers:");
-                foreach (var sell in deal.Sells)
-                {
-                    Console.WriteLine("{0} at {1} (StationID: {2})", sell.volRemaining, sell.price, sell.stationID);
-                }
-            }
-        }
-
         private static void SaveToDatabase(ConcurrentQueue<Order> incomingOrders, OrderStorage db)
         {
             List<Order> orderList = new List<Order>();
