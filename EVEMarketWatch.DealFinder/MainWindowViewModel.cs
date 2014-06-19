@@ -16,14 +16,23 @@ namespace EVEMarketWatch.DealFinder
     {
         private OrderStorage _orderStorage;
 
+        private List<Order> _orders;
+
         public MainWindowViewModel()
         {
             _orderStorage = IoC.Get<OrderStorage>();
 
             DisplayName = "Fetching data...";
+            _orders = new List<Order>();
 
             Thread fetchDealsThread = new Thread(() =>
             {
+                foreach (var page in _orderStorage.GetOrdersPaged(1000))
+                {
+                    _orders.AddRange(page);
+                    DisplayName = "Fetching data... " + _orders.Count;
+                }
+
                 SpotSweetDeals();
             });
 
@@ -49,7 +58,7 @@ namespace EVEMarketWatch.DealFinder
 
         private void SpotSweetDeals()
         {
-            var orders = _orderStorage.RecentOrders
+            var orders = _orders
                 .Where(o => o.volRemaining > 10)
                 .GroupBy(o => o.typeID);
 

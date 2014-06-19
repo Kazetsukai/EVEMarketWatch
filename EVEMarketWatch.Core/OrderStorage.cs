@@ -51,6 +51,26 @@ namespace EVEMarketWatch.Core
             }
         }
 
+        public IEnumerable<IEnumerable<Order>> GetOrdersPaged(int pageSize)
+        {
+            using (var session = _sessionFactory.OpenSession())
+            {
+                var count = session.CreateCriteria<Order>()
+                    .SetProjection(NHibernate.Criterion.Projections.RowCount())
+                    .FutureValue<int>().Value;
+
+                for (int i = 0; i < count; i += pageSize)
+                {
+                    var orders = session.CreateCriteria<Order>()
+                        .SetFirstResult(i)
+                        .SetMaxResults(pageSize)
+                        .Future<Order>();
+
+                    yield return orders;
+                }
+            }
+        }
+
         public IEnumerable<Order> RecentOrders
         {
             get 
@@ -68,7 +88,7 @@ namespace EVEMarketWatch.Core
             {
                 foreach (var order in orders)
                 {
-                    session.Save(order);
+                    session.SaveOrUpdate(order);
                 }
                 tx.Commit();
             }

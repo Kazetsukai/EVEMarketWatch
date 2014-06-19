@@ -8,8 +8,6 @@ namespace EVEMarketWatch.Core.Domain
 {
     public class Order
     {
-        public virtual Guid Id { get; set; }
-
         public virtual int typeID { get; set; }
         public virtual int regionID { get; set; }
         public virtual DateTime generatedAt { get; set; }
