@@ -15,8 +15,9 @@ namespace EVEMarketWatch.Core
 {
     public class OrderStorage
     {
-        public readonly static string DatabasePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "EveMarket", "storage.sqlite");
-        
+        public readonly static string DatabasePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "EveMarket");
+        public readonly static string DatabaseFilename = Path.Combine(DatabasePath, "storage.sqlite");
+
         private NHibernate.ISessionFactory _sessionFactory;
 
         public OrderStorage()
@@ -24,11 +25,14 @@ namespace EVEMarketWatch.Core
             // Initialize NHibernate
             var cfg = new Configuration();
             cfg.Configure();
-            cfg.SetProperty("connection.connection_string", "Data Source=" + DatabasePath + ";Version=3");
+            cfg.SetProperty("connection.connection_string", "Data Source=" + DatabaseFilename + ";Version=3");
             cfg.AddAssembly(typeof(Domain.Order).Assembly);
 
+            if (!Directory.Exists(DatabasePath))
+                Directory.CreateDirectory(DatabasePath);
+
             // Create database and table if file doesn't exist yet
-            if (!File.Exists(DatabasePath))
+            if (!File.Exists(DatabaseFilename))
             {
                 var schema = new SchemaExport(cfg);
                 schema.Create(false, true);
