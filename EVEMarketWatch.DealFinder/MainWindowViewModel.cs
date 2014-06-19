@@ -49,7 +49,9 @@ namespace EVEMarketWatch.DealFinder
 
         private void SpotSweetDeals()
         {
-            var orders = _orderStorage.RecentOrders.GroupBy(o => o.typeID);
+            var orders = _orderStorage.RecentOrders
+                .Where(o => o.volRemaining > 10)
+                .GroupBy(o => o.typeID);
 
             var idealRatio = 1.1;
 
