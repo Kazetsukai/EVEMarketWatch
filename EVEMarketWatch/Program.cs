@@ -56,7 +56,7 @@ namespace EVEMarketWatch
                     service.SendIt(order.solarSystemID.ToString());
             }
 
-            //db.AddOrders(orderList);
+            db.AddOrders(orderList);
             //var orders = db.Orders;
 
             //Console.WriteLine(orders.Average(o => o.price) + "  - " + orders.Count());

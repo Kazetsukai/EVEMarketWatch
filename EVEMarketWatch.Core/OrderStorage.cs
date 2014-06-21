@@ -88,7 +88,14 @@ namespace EVEMarketWatch.Core
             {
                 foreach (var order in orders)
                 {
-                    session.SaveOrUpdate(order);
+                    var existingOrder = session.Get<Order>(order.orderID);
+                    if (existingOrder != null)
+                    {
+                        existingOrder.UpdateFrom(order);
+                        session.Update(existingOrder);
+                    }
+                    else
+                        session.Save(order);
                 }
                 tx.Commit();
             }
