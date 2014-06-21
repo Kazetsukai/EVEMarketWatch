@@ -1,0 +1,105 @@
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
+<html>
+	<head>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */		
+		</style>
+	</head>
+	<body>
+
+    <div id="demo">
+        <div id="buttons">
+	        <button id="data1">Where is:</button>
+	        <input id="system" value="Cat"></input>
+	        <button onclick="connect()">Connect</button>
+        </div>
+    </div>
+
+		<script type="text/javascript">
+
+		    function connect() {
+	            var ws = new WebSocket("ws://localhost:8088/eve");
+
+	            ws.onopen = function () {
+	                console.log("connected");
+	            };
+
+	            ws.onmessage = function (evt) {
+	                var received_msg = evt.data;
+	                console.log("Message received = '" + received_msg + "'");
+	                doAction(received_msg);
+	            };
+
+	            ws.onclose = function () {
+	                // websocket is closed.
+	                console.log("Connection is closed...");
+	            };
+        	};
+
+			//Width and height
+			var w = 600;
+			var h = 600;
+
+			var dataset = [];
+
+			d3.select("#data1")
+			        .on("click", function(d,i) {
+			            doAction(document.getElementById("system").value)
+			        }) 
+
+
+			var securityScale = d3.scale.linear()
+										.domain([0, 0.4, 1])
+										.range(["red", "yellow", "green"]);
+			
+			d3.csv("solarSystems.csv", function(data) {
+			   dataset = data.map(function(d) { return [ +d["x"], +d["z"], d["itemName"], +d["security"], +d["itemID"] ]; });
+			   
+			svg.selectAll("circle")
+			   .data(dataset)
+			   .enter()
+			   .append("circle")
+			   .attr("cx", function(d) {
+			   		return (d[0] / 10000000000000000) * 5 + 300;
+			   })
+			   .attr("cy", function(d) {
+			   		return (d[1] / 10000000000000000) * 5 + 300;
+			   })
+			   .attr("r", 1)
+			   .attr("fill", function(d) {
+			   		return securityScale(d[3]);
+			   })
+			   .attr("id", function(d) {
+			   		return "A" + d[4]; //can't have numbers as ids
+			   })
+			   .append("svg:title").text(function(d) { 
+			   	return d[2]; 
+			   });
+			});
+	
+			//Create SVG element
+			var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+
+			function doAction(system)
+			{
+				svg.select("#A" + system) //can't have numbers as ids
+					.transition()
+					.attr("r", 5)
+					.duration(200)
+					.each("end", function() { 
+						    d3.select(this).      
+						      transition()
+						      .duration(200)      
+						        .attr("r", 1)});
+			}
+
+			
+			
+		</script>
+	</body>
+</html>
