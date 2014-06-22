@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVEMarketWatch.Gatherer", "EVEMarketWatch\EVEMarketWatch.Gatherer.csproj", "{609FE9E0-F49A-4CC6-A822-50C510598288}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVEMarketWatch.Gatherer", "EVEMarketWatch.Gatherer\EVEMarketWatch.Gatherer.csproj", "{609FE9E0-F49A-4CC6-A822-50C510598288}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVEMarketWatch.Core", "EVEMarketWatch.Core\EVEMarketWatch.Core.csproj", "{2F276F4B-A19C-4BB9-A875-18F53854CDA6}"
 EndProject
