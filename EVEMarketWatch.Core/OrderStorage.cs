@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EVEMarketWatch.Core.Domain;
+using System.Collections.Concurrent;
 
 namespace EVEMarketWatch.Core
 {
@@ -51,36 +52,6 @@ namespace EVEMarketWatch.Core
             }
         }
 
-        public IEnumerable<IEnumerable<Order>> GetOrdersPaged(int pageSize)
-        {
-            using (var session = _sessionFactory.OpenSession())
-            {
-                var count = session.CreateCriteria<Order>()
-                    .SetProjection(NHibernate.Criterion.Projections.RowCount())
-                    .FutureValue<int>().Value;
-
-                for (int i = 0; i < count; i += pageSize)
-                {
-                    var orders = session.CreateCriteria<Order>()
-                        .SetFirstResult(i)
-                        .SetMaxResults(pageSize)
-                        .Future<Order>();
-
-                    yield return orders;
-                }
-            }
-        }
-
-        public IEnumerable<Order> RecentOrders
-        {
-            get 
-            {
-                return GetOrders(i => i
-                    .OrderByDescending(o => o.generatedAt)
-                    .Take(100000));
-            }
-        }
-
         public void AddOrders(List<Order> orders)
         {
             using (var session = _sessionFactory.OpenSession())
@@ -98,6 +69,15 @@ namespace EVEMarketWatch.Core
                         session.Save(order);
                 }
                 tx.Commit();
+            }
+        }
+
+        public IEnumerable<Order> GetOrdersSince(DateTime dateTime)
+        {
+            using (var session = _sessionFactory.OpenSession())
+            using (var tx = session.BeginTransaction())
+            {
+                return session.Query<Order>().Where(o => o.generatedAt > dateTime).ToList();
             }
         }
     }

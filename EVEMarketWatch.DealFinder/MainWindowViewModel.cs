@@ -27,11 +27,7 @@ namespace EVEMarketWatch.DealFinder
 
             Thread fetchDealsThread = new Thread(() =>
             {
-                foreach (var page in _orderStorage.GetOrdersPaged(1000))
-                {
-                    _orders.AddRange(page);
-                    DisplayName = "Fetching data... " + _orders.Count;
-                }
+                _orders.AddRange(_orderStorage.GetOrdersSince(DateTime.Now.Subtract(TimeSpan.FromDays(10))));
 
                 SpotSweetDeals();
             });
