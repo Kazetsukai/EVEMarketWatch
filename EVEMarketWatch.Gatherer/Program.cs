@@ -126,6 +126,11 @@ namespace EVEMarketWatch
             }
         }
 
+        /// <summary>
+        /// When this class is automatically instantiated by the websocketserver
+        /// it will add itself to a global list. Use 'SendIt' to send a string
+        /// to connected clients
+        /// </summary>
         public class MapService : WebSocketService
         {
             public bool Connected { get; set; }

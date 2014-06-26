@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EVEMarketWatch.Core.Domain
 {
@@ -18,6 +14,11 @@ namespace EVEMarketWatch.Core.Domain
         public virtual double orderID { get; set; }
         public virtual double volEntered { get; set; }
         public virtual double minVolume { get; set; }
+
+        /// <summary>
+        /// if true, it's a buy order
+        /// if false, it's a sell order
+        /// </summary>
         public virtual bool bid { get; set; }
         public virtual DateTime issueDate { get; set; }
         public virtual double duration { get; set; }

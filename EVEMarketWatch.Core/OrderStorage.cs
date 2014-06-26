@@ -4,13 +4,9 @@ using NHibernate.Tool.hbm2ddl;
 using NHibernate.Linq;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EVEMarketWatch.Core.Domain;
-using System.Collections.Concurrent;
 using System.Data;
 
 namespace EVEMarketWatch.Core
@@ -20,7 +16,7 @@ namespace EVEMarketWatch.Core
         public readonly static string DatabasePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "EveMarket");
         public readonly static string DatabaseFilename = Path.Combine(DatabasePath, "storage.sqlite");
 
-        private NHibernate.ISessionFactory _sessionFactory;
+        private readonly ISessionFactory _sessionFactory;
 
         public OrderStorage()
         {
@@ -28,7 +24,7 @@ namespace EVEMarketWatch.Core
             var cfg = new Configuration();
             cfg.Configure();
             cfg.SetProperty("connection.connection_string", "Data Source=" + DatabaseFilename + ";Version=3");
-            cfg.AddAssembly(typeof(Domain.Order).Assembly);
+            cfg.AddAssembly(typeof(Order).Assembly);
 
             if (!Directory.Exists(DatabasePath))
                 Directory.CreateDirectory(DatabasePath);
@@ -68,6 +64,7 @@ namespace EVEMarketWatch.Core
                 foreach (var order in orders)
                 {
                     var existingOrder = session.Get<Order>(order.orderID);
+
                     if (existingOrder != null)
                     {
                         existingOrder.UpdateFrom(order);
