@@ -52,7 +52,7 @@ namespace EVEMarketWatch
             {
                 orderList.Add(order);
 
-                foreach (var service in Services)
+                foreach (var service in Services) //TODO: this is not thread safe
                     service.SendIt(order.solarSystemID.ToString());
             }
 

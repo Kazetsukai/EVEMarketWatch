@@ -13,6 +13,7 @@
 	        <button id="data1">Where is:</button>
 	        <input id="system" value="Cat"></input>
 	        <button onclick="connect()">Connect</button>
+	        <p id="connectionStatus">Not connected</p>
         </div>
     </div>
 
@@ -23,17 +24,18 @@
 
 	            ws.onopen = function () {
 	                console.log("connected");
+	                document.getElementById("connectionStatus").innerHTML = "Connected";
 	            };
 
 	            ws.onmessage = function (evt) {
 	                var received_msg = evt.data;
-	                console.log("Message received = '" + received_msg + "'");
-	                doAction(received_msg);
+	                //console.log("Message received = '" + received_msg + "'");
+	                throbSolarSystem(received_msg);
 	            };
 
 	            ws.onclose = function () {
-	                // websocket is closed.
-	                console.log("Connection is closed...");
+	                console.log("disconnected");
+	                document.getElementById("connectionStatus").innerHTML = "Disconnected";
 	            };
         	};
 
@@ -45,7 +47,7 @@
 
 			d3.select("#data1")
 			        .on("click", function(d,i) {
-			            doAction(document.getElementById("system").value)
+			            throbSolarSystem(document.getElementById("system").value)
 			        }) 
 
 
@@ -85,7 +87,7 @@
 						.attr("height", h);
 
 
-			function doAction(system)
+			function throbSolarSystem(system)
 			{
 				svg.select("#A" + system) //can't have numbers as ids
 					.transition()
@@ -96,6 +98,14 @@
 						      transition()
 						      .duration(200)      
 						        .attr("r", 1)});
+			}
+
+			function growSolarSystem(system)
+			{
+				svg.select("#A" + system) //can't have numbers as ids
+					.transition()
+					.attr("r", 5)
+					.duration(200);
 			}
 
 			
