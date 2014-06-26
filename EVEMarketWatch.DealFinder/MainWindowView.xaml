@@ -12,13 +12,17 @@
         <ListView x:Name="Deals" SelectedItem="{Binding SelectedItem}" Grid.Column="0">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding MaxMargin}"/>
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="s1" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="s2" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="s3" />
+                        </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="          "/>
-
-                        <TextBlock Text="{Binding TypeId}"/>
-                    </StackPanel>
+                        <TextBlock Text="{Binding TypeName}" Grid.Column="0" Margin="5"/>
+                        <TextBlock Text="{Binding MarginPerMetreCubed}" Grid.Column="1" Margin="5"/>
+                        <TextBlock Text="{Binding MaxMargin}" Grid.Column="2" Margin="5"/>
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

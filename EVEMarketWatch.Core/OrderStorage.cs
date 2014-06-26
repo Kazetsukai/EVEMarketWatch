@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EVEMarketWatch.Core.Domain;
 using System.Collections.Concurrent;
+using System.Data;
 
 namespace EVEMarketWatch.Core
 {
@@ -41,6 +42,13 @@ namespace EVEMarketWatch.Core
 
             // Get ourselves an NHibernate Session
             _sessionFactory = cfg.BuildSessionFactory();
+
+            using (var session = _sessionFactory.OpenSession())
+            using (IDbCommand command = session.Connection.CreateCommand())
+            {
+                command.CommandText = "PRAGMA journal_mode=WAL";
+                command.ExecuteNonQuery();
+            }
         }
 
         public IEnumerable<T> GetOrders<T>(Func<IQueryable<Order>, IQueryable<T>> doQuery)

@@ -49,17 +49,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\InventoryType.cs" />
     <Compile Include="Domain\History.cs" />
     <Compile Include="Domain\Order.cs" />
     <Compile Include="OrderStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utility\CSVParser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Mappings\Order.hbm.xml" />
+    <EmbeddedResource Include="Mappings\Order.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="hibernate.cfg.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="x64\SQLite.Interop.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -69,6 +74,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Data\constellations.csv" />
+    <EmbeddedResource Include="Data\invTypes.csv" />
+    <EmbeddedResource Include="Data\regions.csv" />
+    <EmbeddedResource Include="Data\solarSystems.csv" />
+    <EmbeddedResource Include="Data\stations.csv" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
