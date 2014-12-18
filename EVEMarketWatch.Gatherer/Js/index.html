@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<script type="text/javascript" src="d3.js"></script>
+		<script type="text/javascript" src="jquery-1.11.1.js"></script>
 		<style type="text/css">
 			/* No style rules here yet */		
 		</style>
@@ -10,8 +11,9 @@
 
     <div id="demo">
         <div id="buttons">
-	        <button id="data1">Where is:</button>
-	        <input id="system" value="Cat"></input>
+	        <button onclick="button()">Route:</button>
+	        <input id="systemFrom" value="Cat"></input>
+	        <input id="systemTo" value="Jita"></input>
 	        <button onclick="connect()">Connect</button>
 	        <p id="connectionStatus">Not connected</p>
         </div>
@@ -19,8 +21,23 @@
 
 		<script type="text/javascript">
 
+			function button() {
+
+				var from = document.getElementById("systemFrom").value;
+				var to =document.getElementById("systemTo").value;
+
+				$.getJSON("http://api.eve-central.com/api/route/from/" + from + "/to/" + to, function(data)
+				{
+					$.each(data, function(key, val) {
+						//console.log(val.from.systemid);
+						growSolarSystem(val.from.systemid);
+
+					});
+				});
+			};
+
 		    function connect() {
-	            var ws = new WebSocket("ws://localhost:8088/eve");
+	            var ws = new WebSocket("ws://192.168.1.162:8088/eve");
 
 	            ws.onopen = function () {
 	                console.log("connected");
@@ -30,7 +47,11 @@
 	            ws.onmessage = function (evt) {
 	                var received_msg = evt.data;
 	                //console.log("Message received = '" + received_msg + "'");
-	                throbSolarSystem(received_msg);
+
+	                var obj = $.parseJSON(received_msg);
+
+	                throbSolarSystem(obj.System);
+	                console.log(obj.Type);
 	            };
 
 	            ws.onclose = function () {
@@ -39,16 +60,21 @@
 	            };
         	};
 
+        	function getSolarSystemPath()
+        	{
+
+        	};
+
 			//Width and height
 			var w = 600;
 			var h = 600;
 
 			var dataset = [];
 
-			d3.select("#data1")
+			/*d3.select("#data1")
 			        .on("click", function(d,i) {
 			            throbSolarSystem(document.getElementById("system").value)
-			        }) 
+			        }) */
 
 
 			var securityScale = d3.scale.linear()
@@ -66,7 +92,7 @@
 			   		return (d[0] / 10000000000000000) * 5 + 300;
 			   })
 			   .attr("cy", function(d) {
-			   		return (d[1] / 10000000000000000) * 5 + 300;
+			   		return (-d[1] / 10000000000000000) * 5 + 300;
 			   })
 			   .attr("r", 1)
 			   .attr("fill", function(d) {

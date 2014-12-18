@@ -23,9 +23,9 @@ namespace EVEMarketWatch.Utils
             {
                 var order = new Order();
 
-                for (int i = 0; i < row.Count; i++)
+                for (var i = 0; i < row.Count; i++)
                 {
-                    PropertyInfo prop = typeof(Order).GetProperty(data.columns[i], BindingFlags.Public | BindingFlags.Instance);
+                    var prop = typeof(Order).GetProperty(data.columns[i], BindingFlags.Public | BindingFlags.Instance);
 
                     if (null != prop && prop.CanWrite)
                     {
@@ -56,9 +56,9 @@ namespace EVEMarketWatch.Utils
             {
                 var history = new History();
 
-                for (int i = 0; i < row.Count; i++)
+                for (var i = 0; i < row.Count; i++)
                 {
-                    PropertyInfo prop = typeof(History).GetProperty(data.columns[i], BindingFlags.Public | BindingFlags.Instance);
+                    var prop = typeof(History).GetProperty(data.columns[i], BindingFlags.Public | BindingFlags.Instance);
 
                     if (null != prop && prop.CanWrite)
                     {

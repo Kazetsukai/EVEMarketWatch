@@ -1,5 +1,7 @@
 ﻿using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.Dialect;
+using NHibernate.Driver;
 using NHibernate.Tool.hbm2ddl;
 using NHibernate.Linq;
 using System;
@@ -22,29 +24,20 @@ namespace EVEMarketWatch.Core
         {
             // Initialize NHibernate
             var cfg = new Configuration();
-            cfg.Configure();
-            cfg.SetProperty("connection.connection_string", "Data Source=" + DatabaseFilename + ";Version=3");
+            //cfg.Configure();
+            cfg.DataBaseIntegration(x =>
+            {
+                x.ConnectionString = @"Server=.\SQLExpress; Database=evemarket; Integrated Security=SSPI;";
+                x.Driver<SqlClientDriver>();
+                x.Dialect<MsSql2012Dialect>();
+            });
+
             cfg.AddAssembly(typeof(Order).Assembly);
 
-            if (!Directory.Exists(DatabasePath))
-                Directory.CreateDirectory(DatabasePath);
-
-            // Create database and table if file doesn't exist yet
-            if (!File.Exists(DatabaseFilename))
-            {
-                var schema = new SchemaExport(cfg);
-                schema.Create(false, true);
-            }
+            new SchemaUpdate(cfg).Execute(true, true);
 
             // Get ourselves an NHibernate Session
             _sessionFactory = cfg.BuildSessionFactory();
-
-            using (var session = _sessionFactory.OpenSession())
-            using (IDbCommand command = session.Connection.CreateCommand())
-            {
-                command.CommandText = "PRAGMA journal_mode=WAL";
-                command.ExecuteNonQuery();
-            }
         }
 
         public IEnumerable<T> GetOrders<T>(Func<IQueryable<Order>, IQueryable<T>> doQuery)

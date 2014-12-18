@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using EVEMarketWatch.Core.Data;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,21 +20,24 @@ namespace EVEMarketWatch
     class Program
     {
         private static readonly List<MapService> Services = new List<MapService>();
+        private static IDictionary<int, InventoryType> _invTypes;
 
         static void Main(string[] args)
         {
-            var incomingOrders = new ConcurrentQueue<Order>();
+            _invTypes = InventoryType.GetAll();
+
+            var incomingOrders = new ConcurrentQueue<DataInterchange>();
 
             var receiveThread = new Thread(() => ReceiveOrders(incomingOrders));
             receiveThread.Start();
 
             var db = new OrderStorage();
 
-            var wssv = new WebSocketServer("ws://localhost:8088");
+            var wssv = new WebSocketServer("ws://192.168.1.118:8088");
 
             wssv.AddWebSocketService<MapService>("/eve");
             wssv.Start();
-            
+
             while (true)
             {
                 SaveToDatabase(incomingOrders, db);
@@ -42,18 +46,35 @@ namespace EVEMarketWatch
             wssv.Stop();
         }
 
-        private static void SaveToDatabase(ConcurrentQueue<Order> incomingOrders, OrderStorage db)
+        private class ClientTransmission
+        {
+            public ClientTransmission(Order order)
+            {
+                System = order.solarSystemID.ToString("N0").Replace(",", "");
+                Type = _invTypes[order.typeID].TypeName;
+            }
+
+            public string System { get; set; }
+            public string Type { get; set; }
+        }
+
+        private static void SaveToDatabase(ConcurrentQueue<DataInterchange> incomingOrders, OrderStorage db)
         {
             var orderList = new List<Order>();
 
             orderList.Clear();
-            Order order;
-            while (incomingOrders.TryDequeue(out order))
+            DataInterchange data;
+            while (incomingOrders.TryDequeue(out data))
             {
-                orderList.Add(order);
+                orderList = data.ConvertToOrders();
+
+/*                var container = new ClientTransmission(order);
+
+                var jsonString = JsonConvert.SerializeObject(container);
 
                 foreach (var service in Services) //TODO: this is not thread safe
-                    service.SendIt(order.solarSystemID.ToString());
+                    service.SendIt(jsonString);
+                    //service.SendIt(order.solarSystemID.ToString());*/
             }
 
             db.AddOrders(orderList);
@@ -61,11 +82,13 @@ namespace EVEMarketWatch
 
             //Console.WriteLine(orders.Average(o => o.price) + "  - " + orders.Count());
 
-            if (orderList.Count > 0) 
-                Console.WriteLine(orderList.Count + " processed...");
+            if (!orderList.Any()) 
+                return;
+
+            Console.WriteLine(_invTypes.ContainsKey(orderList.First().typeID) ? _invTypes[orderList.First().typeID].TypeName : "***UNKNOWN***");
         }
 
-        private static void ReceiveOrders(ConcurrentQueue<Order> incomingOrders)
+        private static void ReceiveOrders(ConcurrentQueue<DataInterchange> incomingData)
         {
             using (var context = ZmqContext.Create())
             {
@@ -110,12 +133,14 @@ namespace EVEMarketWatch
 
                             var obj = JsonConvert.DeserializeObject<DataInterchange>(marketJson);
 
-                            var orders = obj.ConvertToOrders();
+                            incomingData.Enqueue(obj);
+
+/*                            var orders = obj.ConvertToOrders();
 
                             foreach (var order in orders)
                             {
-                                incomingOrders.Enqueue(order);
-                            }
+                                incomingData.Enqueue(order);
+                            }*/
                         }
                         catch (ZmqException ex)
                         {
