@@ -4,7 +4,9 @@ namespace EVEMarketWatch.Core.Domain
 {
     public class Order
     {
+// ReSharper disable InconsistentNaming
         public virtual int typeID { get; set; }
+
         public virtual int regionID { get; set; }
         public virtual DateTime generatedAt { get; set; }
 
@@ -24,6 +26,7 @@ namespace EVEMarketWatch.Core.Domain
         public virtual double duration { get; set; }
         public virtual double stationID { get; set; }
         public virtual double solarSystemID { get; set; }
+// ReSharper restore InconsistentNaming
     }
 
     public static class OrderHelper
