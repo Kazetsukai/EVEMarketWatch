@@ -33,17 +33,17 @@ namespace EVEMarketWatch
 
             var db = new OrderStorage();
 
-            var wssv = new WebSocketServer("ws://192.168.1.118:8088");
+           /* var wssv = new WebSocketServer("ws://192.168.1.118:8088");
 
             wssv.AddWebSocketService<MapService>("/eve");
-            wssv.Start();
+            wssv.Start();*/
 
             while (true)
             {
                 SaveToDatabase(incomingOrders, db);
             }
 
-            wssv.Stop();
+            //wssv.Stop();
         }
 
         private class ClientTransmission
@@ -142,7 +142,7 @@ namespace EVEMarketWatch
                                 incomingData.Enqueue(order);
                             }*/
                         }
-                        catch (ZmqException ex)
+                        catch (Exception ex)
                         {
                             Console.WriteLine("ZMQ Exception occurred : {0}", ex.Message);
                         }
