@@ -40,6 +40,15 @@ namespace EVEMarketWatch.Core
             _sessionFactory = cfg.BuildSessionFactory();
         }
 
+        public void Prune(DateTime dateTime)
+        {
+            using (var session = _sessionFactory.OpenSession())
+            using (var tx = session.BeginTransaction())
+            {
+                
+            }
+        }
+
         public IEnumerable<T> GetOrders<T>(Func<IQueryable<Order>, IQueryable<T>> doQuery)
         {
             using (var session = _sessionFactory.OpenSession())
@@ -51,6 +60,9 @@ namespace EVEMarketWatch.Core
 
         public void AddOrders(List<Order> orders)
         {
+            if (!orders.Any())
+                return;
+
             using (var session = _sessionFactory.OpenSession())
             using (var tx = session.BeginTransaction())
             {
@@ -76,6 +88,15 @@ namespace EVEMarketWatch.Core
             using (var tx = session.BeginTransaction())
             {
                 return session.Query<Order>().Where(o => o.generatedAt > dateTime).ToList();
+            }
+        }
+
+        public IEnumerable<Order> GetOrdersOfTypeId(int typeId)
+        {
+            using (var session = _sessionFactory.OpenSession())
+            using (var tx = session.BeginTransaction())
+            {
+                return session.Query<Order>().Where(o => o.typeID == typeId).ToList();
             }
         }
     }

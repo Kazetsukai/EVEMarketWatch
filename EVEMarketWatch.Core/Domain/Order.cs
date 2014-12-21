@@ -23,6 +23,7 @@ namespace EVEMarketWatch.Core.Domain
         /// </summary>
         public virtual bool bid { get; set; }
         public virtual DateTime issueDate { get; set; }
+        public virtual DateTime expiryDate { get; set; }
         public virtual double duration { get; set; }
         public virtual double stationID { get; set; }
         public virtual double solarSystemID { get; set; }
@@ -40,6 +41,7 @@ namespace EVEMarketWatch.Core.Domain
             me.minVolume = order.minVolume;
             me.bid = order.bid;
             me.issueDate = order.issueDate;
+            me.expiryDate = order.expiryDate;
             me.duration = order.duration;
             me.stationID = order.stationID;
             me.solarSystemID = order.solarSystemID;
@@ -48,6 +50,16 @@ namespace EVEMarketWatch.Core.Domain
             me.typeID = order.typeID;
 
             // Todo: some consistency checking (typeID etc shouldn't change)
+        }
+
+        public static bool IsBuy(this Order order)
+        {
+            return order.bid;
+        }
+
+        public static bool IsSell(this Order order)
+        {
+            return !order.bid;
         }
     }
 }

@@ -36,6 +36,7 @@ namespace EVEMarketWatch.Utils
                 order.typeID = rowset.typeID;
                 order.regionID = rowset.regionID;
                 order.generatedAt = rowset.generatedAt;
+                order.expiryDate = order.issueDate.AddDays(order.duration);
 
                 parsedOrders.Add(order);
             }

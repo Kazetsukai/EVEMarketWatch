@@ -15,6 +15,7 @@
     <property name="minVolume" />
     <property name="bid" />
     <property name="issueDate" />
+    <property name="expiryDate" />
     <property name="duration" />
     <property name="stationID" />
     <property name="solarSystemID" />
