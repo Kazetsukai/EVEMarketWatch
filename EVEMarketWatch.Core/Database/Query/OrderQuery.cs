@@ -33,5 +33,14 @@ namespace EVEMarketWatch.Core.Database.Query
                 return session.Query<Order>().Where(o => o.typeID == typeId).ToList();
             }
         }
+
+        public IEnumerable<Order> GetExpiredOrders()
+        {
+            using (var session = _sessionFactory.OpenSession())
+            using (var tx = session.BeginTransaction())
+            {
+                return session.Query<Order>().Where(o => o.expiryDate < DateTime.UtcNow).ToList(); //assumption that dates are in utc
+            }
+        }
     }
 }

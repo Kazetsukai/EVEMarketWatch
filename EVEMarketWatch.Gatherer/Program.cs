@@ -1,4 +1,8 @@
-﻿using EVEMarketWatch.Core.Data;
+﻿using System.Reflection;
+using EVEMarketWatch.Core.Data;
+using EVEMarketWatch.Core.Database;
+using EVEMarketWatch.Core.Database.Query;
+using EVEMarketWatch.Core.Database.Repository;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -8,6 +12,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Ninject;
+using Ninject.Modules;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 using ZeroMQ;
@@ -24,6 +30,14 @@ namespace EVEMarketWatch
 
         static void Main(string[] args)
         {
+            //start ninject
+            var kernel = new StandardKernel();
+            //kernel.Load(Assembly.GetExecutingAssembly());
+
+            //start the db
+            var db = new ConfigureDatabase();
+            var sessionFactory = db.Create(kernel);
+
             _invTypes = InventoryType.GetAll();
 
             var incomingOrders = new ConcurrentQueue<DataInterchange>();
@@ -31,19 +45,18 @@ namespace EVEMarketWatch
             var receiveThread = new Thread(() => ReceiveOrders(incomingOrders));
             receiveThread.Start();
 
-            var db = new OrderStorage();
+            //var expired = new OrderQuery(sessionFactory).GetExpiredOrders();
+            //var plex = new OrderQuery(sessionFactory).GetOrdersOfTypeId(29668).Where(x => x.IsSell()).OrderByDescending(x => x.price);
 
-           /* var wssv = new WebSocketServer("ws://192.168.1.118:8088");
-
-            wssv.AddWebSocketService<MapService>("/eve");
-            wssv.Start();*/
-
-            while (true)
+            using (var session = sessionFactory.OpenSession())
             {
-                SaveToDatabase(incomingOrders, db);
-            }
+                var orderRepo = new OrderRepository(session);
 
-            //wssv.Stop();
+                while (true)
+                {
+                    SaveToDatabase(incomingOrders, orderRepo);
+                }
+            }
         }
 
         private class ClientTransmission
@@ -58,7 +71,7 @@ namespace EVEMarketWatch
             public string Type { get; set; }
         }
 
-        private static void SaveToDatabase(ConcurrentQueue<DataInterchange> incomingOrders, OrderStorage db)
+        private static void SaveToDatabase(ConcurrentQueue<DataInterchange> incomingOrders, OrderRepository db)
         {
             var orderList = new List<Order>();
 
@@ -68,13 +81,13 @@ namespace EVEMarketWatch
             {
                 orderList = data.ConvertToOrders();
 
-/*                var container = new ClientTransmission(order);
+                /*                var container = new ClientTransmission(order);
 
-                var jsonString = JsonConvert.SerializeObject(container);
+                                var jsonString = JsonConvert.SerializeObject(container);
 
-                foreach (var service in Services) //TODO: this is not thread safe
-                    service.SendIt(jsonString);
-                    //service.SendIt(order.solarSystemID.ToString());*/
+                                foreach (var service in Services) //TODO: this is not thread safe
+                                    service.SendIt(jsonString);
+                                    //service.SendIt(order.solarSystemID.ToString());*/
             }
 
             db.AddOrders(orderList);
@@ -82,7 +95,7 @@ namespace EVEMarketWatch
 
             //Console.WriteLine(orders.Average(o => o.price) + "  - " + orders.Count());
 
-            if (!orderList.Any()) 
+            if (!orderList.Any())
                 return;
 
             Console.WriteLine(_invTypes.ContainsKey(orderList.First().typeID) ? _invTypes[orderList.First().typeID].TypeName : "***UNKNOWN***");
@@ -135,12 +148,12 @@ namespace EVEMarketWatch
 
                             incomingData.Enqueue(obj);
 
-/*                            var orders = obj.ConvertToOrders();
+                            /*                            var orders = obj.ConvertToOrders();
 
-                            foreach (var order in orders)
-                            {
-                                incomingData.Enqueue(order);
-                            }*/
+                                                        foreach (var order in orders)
+                                                        {
+                                                            incomingData.Enqueue(order);
+                                                        }*/
                         }
                         catch (Exception ex)
                         {
