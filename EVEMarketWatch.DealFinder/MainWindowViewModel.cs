@@ -1,37 +1,43 @@
 ﻿using Caliburn.Micro;
-using EVEMarketWatch.Core;
 using EVEMarketWatch.Core.Data;
+using EVEMarketWatch.Core.Database;
+using EVEMarketWatch.Core.Database.Query;
 using EVEMarketWatch.Core.Domain;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using EVEMarketWatch.Core.Storage;
+using Ninject;
 
 namespace EVEMarketWatch.DealFinder
 {
     public class MainWindowViewModel : Screen
     {
-        private OrderStorage _orderStorage;
         private IDictionary<int, InventoryType> _invTypes;
 
         private List<Order> _orders;
 
         public MainWindowViewModel()
         {
-            _orderStorage = IoC.Get<OrderStorage>();
+            //start ninject
+            var kernel = new StandardKernel();
+            //kernel.Load(Assembly.GetExecutingAssembly());
+
+            //start the db
+            var db = new ConfigureDatabase();
+            var sessionFactory = db.Create(kernel);
+
             _invTypes = InventoryType.GetAll();
 
             DisplayName = "Fetching data...";
             _orders = new List<Order>();
 
-            Thread fetchDealsThread = new Thread(() =>
+            //var orderQuery = new OrderQuery(sessionFactory);
+            var orderQuery = kernel.Get<OrderQuery>();
+
+            var fetchDealsThread = new Thread(() =>
             {
-                _orders.AddRange(_orderStorage.GetOrdersSince(DateTime.Now.Subtract(TimeSpan.FromDays(2))));
+                _orders.AddRange(orderQuery.GetOrdersSince(DateTime.Now.Subtract(TimeSpan.FromDays(2))));
                 SpotSweetDeals();
             });
 
@@ -68,7 +74,7 @@ namespace EVEMarketWatch.DealFinder
                         let minSell = g.Any(o => !o.bid) ? g.Where(o => !o.bid).Min(o => o.price) : double.PositiveInfinity
                         let margin = maxBuy / minSell
                         let marginAbsolute = maxBuy - minSell
-                        let type = _invTypes[g.Key]
+                        let type = ResolveInventoryType(g.Key)
                         let volume = type.VolumeNum
                         let marginPerMetreCubed = marginAbsolute / volume
                         where margin > idealRatio
@@ -91,6 +97,14 @@ namespace EVEMarketWatch.DealFinder
                     NotifyOfPropertyChange(() => Deals);
                     DisplayName = Deals.Count() + " potential deals found.";
                 });
+        }
+
+        private InventoryType ResolveInventoryType(int typeId)
+        {
+            if (!_invTypes.ContainsKey(typeId))
+                return new InventoryType();
+
+            return _invTypes[typeId];
         }
     }
 }
