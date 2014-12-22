@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using EVEMarketWatch.Core.Storage;
 
 namespace EVEMarketWatch.DealFinder
 {

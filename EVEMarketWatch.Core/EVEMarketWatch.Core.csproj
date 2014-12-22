@@ -52,7 +52,7 @@
     <Compile Include="Data\InventoryType.cs" />
     <Compile Include="Domain\History.cs" />
     <Compile Include="Domain\Order.cs" />
-    <Compile Include="OrderStorage.cs" />
+    <Compile Include="Storage\OrderStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\CSVParser.cs" />
   </ItemGroup>
@@ -81,7 +81,9 @@
     <EmbeddedResource Include="Data\stations.csv" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Query\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
