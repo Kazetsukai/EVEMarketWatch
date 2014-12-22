@@ -1,17 +1,16 @@
-﻿using NHibernate;
-using NHibernate.Cfg;
-using NHibernate.Dialect;
-using NHibernate.Driver;
-using NHibernate.Tool.hbm2ddl;
-using NHibernate.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using EVEMarketWatch.Core.Domain;
-using System.Data;
+using NHibernate;
+using NHibernate.Cfg;
+using NHibernate.Dialect;
+using NHibernate.Driver;
+using NHibernate.Linq;
+using NHibernate.Tool.hbm2ddl;
 
-namespace EVEMarketWatch.Core
+namespace EVEMarketWatch.Core.Storage
 {
     public class OrderStorage
     {
