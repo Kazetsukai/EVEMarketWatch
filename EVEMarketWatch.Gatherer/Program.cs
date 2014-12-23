@@ -47,54 +47,55 @@ namespace EVEMarketWatch
             using (var session = sessionFactory.OpenSession())
             {
                 var orderRepo = new OrderRepository(session);
+                var historyRepo = new HistoryRepository(session);
 
                 while (true)
                 {
-                    SaveToDatabase(incomingOrders, orderRepo);
+                    SaveOrderToDatabase(incomingOrders, orderRepo);
+                    //SaveHistoryToDatabase(incomingOrders, historyRepo);
                 }
             }
         }
 
-        private class ClientTransmission
-        {
-            public ClientTransmission(Order order)
-            {
-                System = order.solarSystemID.ToString("N0").Replace(",", "");
-                Type = _invTypes[order.typeID].TypeName;
-            }
-
-            public string System { get; set; }
-            public string Type { get; set; }
-        }
-
-        private static void SaveToDatabase(ConcurrentQueue<DataInterchange> incomingData, OrderRepository db)
+        private static void SaveOrderToDatabase(ConcurrentQueue<DataInterchange> incomingData, OrderRepository db)
         {
             var orderList = new List<Order>();
-
             orderList.Clear();
+
             DataInterchange data;
+
             while (incomingData.TryDequeue(out data))
             {
                 orderList = data.ConvertToOrders();
-
-                /*                var container = new ClientTransmission(order);
-
-                                var jsonString = JsonConvert.SerializeObject(container);
-
-                                foreach (var service in Services) //TODO: this is not thread safe
-                                    service.SendIt(jsonString);
-                                    //service.SendIt(order.solarSystemID.ToString());*/
             }
 
             db.AddOrders(orderList);
-            //var orders = db.Orders;
-
-            //Console.WriteLine(orders.Average(o => o.price) + "  - " + orders.Count());
 
             if (!orderList.Any())
                 return;
 
             Console.WriteLine(_invTypes.ContainsKey(orderList.First().typeID) ? _invTypes[orderList.First().typeID].TypeName : "***UNKNOWN***");
+        }
+
+        private static void SaveHistoryToDatabase(ConcurrentQueue<DataInterchange> incomingData, HistoryRepository db)
+        {
+            var historyList = new List<History>();
+            historyList.Clear();
+
+            DataInterchange data;
+
+            while (incomingData.TryDequeue(out data))
+            {
+                historyList = data.ConvertToHistories();
+            }
+
+            foreach (var history in historyList)
+                db.Add(history);
+
+            if (!historyList.Any())
+                return;
+
+            Console.WriteLine(_invTypes.ContainsKey(historyList.First().typeID) ? "H: " + _invTypes[historyList.First().typeID].TypeName : "***UNKNOWN***");
         }
 
         private static void ReceiveOrders(ConcurrentQueue<DataInterchange> incomingData)
