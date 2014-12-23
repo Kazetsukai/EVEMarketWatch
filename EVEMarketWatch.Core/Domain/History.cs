@@ -4,15 +4,22 @@ namespace EVEMarketWatch.Core.Domain
 {
     public class History
     {
-        public int typeID { get; set; }
-        public int regionID { get; set; }
-        public DateTime generatedAt { get; set; }
+        public History()
+        {
+            Id = new Guid();
+        }
 
-        public DateTime date { get; set; }
-        public double orders { get; set; }
-        public double low { get; set; }
-        public double high { get; set; }
-        public double average { get; set; }
-        public double quantity { get; set; }
+        public virtual Guid Id { get; set; }
+
+        public virtual int typeID { get; set; }
+        public virtual int regionID { get; set; }
+        public virtual DateTime generatedAt { get; set; }
+
+        public virtual DateTime date { get; set; }
+        public virtual double orders { get; set; }
+        public virtual double low { get; set; }
+        public virtual double high { get; set; }
+        public virtual double average { get; set; }
+        public virtual double quantity { get; set; }
     }
 }

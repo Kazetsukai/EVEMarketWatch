@@ -1,8 +1,6 @@
-﻿using System.Reflection;
-using EVEMarketWatch.Core.Data;
-using EVEMarketWatch.Core.Database;
-using EVEMarketWatch.Core.Database.Query;
+﻿using EVEMarketWatch.Core.Database;
 using EVEMarketWatch.Core.Database.Repository;
+using EVEMarketWatch.Core.StaticData;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -13,13 +11,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Ninject;
-using Ninject.Modules;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 using ZeroMQ;
 using EVEMarketWatch.Utils;
 using EVEMarketWatch.Core.Domain;
-using EVEMarketWatch.Core;
 
 namespace EVEMarketWatch
 {
@@ -71,13 +67,13 @@ namespace EVEMarketWatch
             public string Type { get; set; }
         }
 
-        private static void SaveToDatabase(ConcurrentQueue<DataInterchange> incomingOrders, OrderRepository db)
+        private static void SaveToDatabase(ConcurrentQueue<DataInterchange> incomingData, OrderRepository db)
         {
             var orderList = new List<Order>();
 
             orderList.Clear();
             DataInterchange data;
-            while (incomingOrders.TryDequeue(out data))
+            while (incomingData.TryDequeue(out data))
             {
                 orderList = data.ConvertToOrders();
 

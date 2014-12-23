@@ -1,13 +1,10 @@
-﻿using EVEMarketWatch.Core.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using EVEMarketWatch.Core.Utility;
 
-namespace EVEMarketWatch.Core.Data
+namespace EVEMarketWatch.Core.StaticData
 {
     public class InventoryType
     {
@@ -42,7 +39,7 @@ namespace EVEMarketWatch.Core.Data
 
         public static IDictionary<int, InventoryType> GetAll()
         {
-            using (var streamReader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("EVEMarketWatch.Core.Data.invTypes.csv")))
+            using (var streamReader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("EVEMarketWatch.Core.StaticData.invTypes.csv")))
             {
                 var dict = new Dictionary<int, InventoryType>();
                 foreach (var i in CSVParser.ParseInto<InventoryType>(streamReader.ReadToEnd()))

@@ -31,20 +31,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentNHibernate">
+      <HintPath>..\packages\FluentNHibernate.2.0.1.0\lib\net40\FluentNHibernate.dll</HintPath>
+    </Reference>
     <Reference Include="Iesi.Collections">
       <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="NHibernate">
-      <HintPath>..\packages\NHibernate.4.0.0-Alpha1\lib\net40\NHibernate.dll</HintPath>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NHibernate.4.0.2.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="Ninject">
       <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.93.0\lib\net45\System.Data.SQLite.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,7 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database\ConfigureDatabase.cs" />
-    <Compile Include="Data\InventoryType.cs" />
+    <Compile Include="Database\Mappings\HistoryMap.cs" />
+    <Compile Include="Database\Mappings\OrderMap.cs" />
+    <Compile Include="StaticData\InventoryType.cs" />
     <Compile Include="Domain\History.cs" />
     <Compile Include="Domain\Order.cs" />
     <Compile Include="Database\Query\OrderQuery.cs" />
@@ -62,27 +65,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Database\Repository\RepositoryBase.cs" />
     <Compile Include="Utility\CSVParser.cs" />
+    <Compile Include="Utility\OrderHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Database\Mappings\Order.hbm.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="hibernate.cfg.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Data\constellations.csv" />
-    <EmbeddedResource Include="Data\invTypes.csv" />
-    <EmbeddedResource Include="Data\regions.csv" />
-    <EmbeddedResource Include="Data\solarSystems.csv" />
-    <EmbeddedResource Include="Data\stations.csv" />
+    <EmbeddedResource Include="StaticData\constellations.csv" />
+    <EmbeddedResource Include="StaticData\invTypes.csv" />
+    <EmbeddedResource Include="StaticData\regions.csv" />
+    <EmbeddedResource Include="StaticData\solarSystems.csv" />
+    <EmbeddedResource Include="StaticData\stations.csv" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

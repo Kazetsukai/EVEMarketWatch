@@ -1,5 +1,4 @@
 ﻿using Caliburn.Micro;
-using EVEMarketWatch.Core.Data;
 using EVEMarketWatch.Core.Database;
 using EVEMarketWatch.Core.Database.Query;
 using EVEMarketWatch.Core.Domain;
@@ -7,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using EVEMarketWatch.Core.StaticData;
 using Ninject;
 
 namespace EVEMarketWatch.DealFinder

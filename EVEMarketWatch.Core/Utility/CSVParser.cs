@@ -20,6 +20,7 @@ namespace EVEMarketWatch.Core.Utility
             var columnHeadings = lines[0].Select(s => s.ToLower()).ToArray();
 
             var relevantProperties = new Dictionary<string, PropertyInfo>();
+
             foreach (var property in typeof(T).GetProperties().Where(p => columnHeadings.Contains(p.Name.ToLower())))
             {
                 relevantProperties.Add(property.Name.ToLower(), property);
